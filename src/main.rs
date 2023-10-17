@@ -51,7 +51,7 @@ pub struct AppArgs {
     /// It will also preview the changes that would be made
     #[clap(default_value_t = false, short('A'), long)]
     pub apply: bool,
-    /// List of fully qualified domain names to update the records of
+    /// List of fully qualified domain names to update the values for
     #[clap(required = true, short('d'), long("domain"))]
     pub domains: Vec<String>,
     /// If this flag is set the 10 second warning on startup will not be shown before applying record changes.
