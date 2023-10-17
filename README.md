@@ -34,3 +34,11 @@ Options:
 
 #### Update records now and also skip 10 second warning on startup, and then keep updating records every 30 minutes
 ```dns-updater --api-key key_with_write_access -d @.example.com -ASm 30```
+
+## WAN IP Source
+
+A text file is created on startup in the working directory that contains a list of api endpoints for querying the current WAN IP. It's then read before every record update.
+
+By default the following endpoints are included:
+* https://api.seeip.org
+* https://api64.ipify.org
