@@ -38,15 +38,25 @@ jobs:
         run: cross build --release --target x86_64-unknown-linux-musl
       - name: Compile x86_64-pc-windows-gnu
         run: cross build --release --target x86_64-pc-windows-gnu
+      - name: Get tag name from current date
+        id: date_tag
+        uses: Kaven-Universe/github-action-current-date-time@v1.2.0
+        with:
+          format: "YYYY-MM-DD_HH-mm-ss"
+      - name: Get release name from current date
+        id: date_release_name
+        uses: Kaven-Universe/github-action-current-date-time@v1.2.0
+        with:
+          format: "YYYY-MM-DD HH-mm-ss"
       - name: Create release
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
           # Tag with current date + time
-          tag: $(date +%Y-%m-%d_%H-%M-%S)
+          tag: ${{ steps.date_tag.outputs.time }}
           makeLatest: true
           commit: ${{ github.sha }}
-          name: Automated Build - $(date +%Y-%m-%d\ %H-%M-%S)
+          name: ${{ format('Automated Build - {0}', steps.date_release_name.outputs.time) }}
           draft: false
           prerelease: false
       - name: "Upload binary: aarch64-unknown-linux-musl"
