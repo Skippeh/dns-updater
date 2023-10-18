@@ -82,16 +82,25 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
                                     results.push((
                                         Level::Info,
                                         format!(
-                                            "{} -> {} (current: {}, TTL: {})",
-                                            arg_domain, wan_ip, record.data, record.ttl
+                                            "{:<30}\t-> {} (current: {:>15}, TTL: {:>5}){}",
+                                            arg_domain,
+                                            wan_ip,
+                                            record.data,
+                                            record.ttl,
+                                            if wan_ip.to_string() == record.data {
+                                                " (up to date)"
+                                            } else {
+                                                ""
+                                            }
                                         ),
                                     ));
                                 } else {
                                     // Update record if it's different
                                     if wan_ip.to_string() == record.data {
+                                        let fqdn = format!("{}.{}", record.name, domain.name);
                                         results.push((
                                             Level::Info,
-                                            format!("✓ {}.{}: up to date", arg_domain, domain.name),
+                                            format!("✓ {:<30}: up to date", fqdn),
                                         ));
 
                                         continue;
@@ -106,21 +115,21 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
                                         )
                                         .await
                                     {
-                                        Ok(new_record) => results.push((
-                                            Level::Info,
-                                            format!(
-                                                "✓ {}.{} -> {} (current: {}, TTL: {})",
-                                                record.name,
-                                                domain.name,
-                                                new_record.data,
-                                                record.data,
-                                                record.ttl
-                                            ),
-                                        )),
+                                        Ok(new_record) => {
+                                            let fqdn =
+                                                format!("{}.{}", new_record.name, domain.name);
+                                            results.push((
+                                                Level::Info,
+                                                format!(
+                                                    "✓ {:<30} -> {} (current: {:>15}, TTL: {:>5})",
+                                                    fqdn, new_record.data, record.data, record.ttl
+                                                ),
+                                            ))
+                                        }
                                         Err(err) => {
                                             results.push((
                                                 Level::Error,
-                                                format!("✗ {arg_domain}: {err}"),
+                                                format!("✗ {arg_domain:<30}: {err}"),
                                             ));
                                         }
                                     }
