@@ -31,3 +31,11 @@ jobs:
         run: cross build --release --target x86_64-unknown-linux-musl
       - name: Compile x86_64-pc-windows-gnu
         run: cross build --release --target x86_64-pc-windows-gnu
+      - name: Create builds artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: binaries
+          path: |
+            target/aarch64-unknown-linux-musl/release/dns-updater
+            target/x86_64-unknown-linux-musl/release/dns-updater
+            target/x86_64-pc-windows-gnu/release/dns-updater.exe
