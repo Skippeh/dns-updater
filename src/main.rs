@@ -68,7 +68,14 @@ async fn main() {
 }
 
 async fn app_main() -> Result<(), AppError> {
-    simple_logger::init_with_level(get_minimum_log_level())
+    simple_logger::SimpleLogger::new()
+        .with_local_timestamps()
+        .with_level(get_minimum_log_level())
+        .env()
+        .with_timestamp_format(time::macros::format_description!(
+            "[year]-[month]-[day] [hour]:[minute]:[second]"
+        ))
+        .init()
         .context("Failed to initialize logger")?;
 
     let args = AppArgs::parse();
@@ -93,10 +100,10 @@ async fn app_main() -> Result<(), AppError> {
     Ok(())
 }
 
-fn get_minimum_log_level() -> log::Level {
+fn get_minimum_log_level() -> log::LevelFilter {
     if cfg!(debug_assertions) {
-        log::Level::Debug
+        log::LevelFilter::Debug
     } else {
-        log::Level::Info
+        log::LevelFilter::Info
     }
 }
