@@ -42,12 +42,11 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
-          tag: "latest"
+          # Tag with current date + time
+          tag: $(date +%Y-%m-%d_%H-%M-%S)
           makeLatest: true
-          allowUpdates: true
-          removeArtifacts: true
           commit: ${{ github.sha }}
-          name: Latest release
+          name: Automated Build - $(date +%Y-%m-%d\ %H-%M-%S)
           draft: false
           prerelease: false
       - name: "Upload binary: aarch64-unknown-linux-musl"
