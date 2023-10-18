@@ -43,6 +43,9 @@ jobs:
         uses: ncipollo/release-action@v1.13.0
         with:
           tag: "latest"
+          makeLatest: true
+          allowUpdates: true
+          removeArtifacts: true
           commit: ${{ github.sha }}
           name: Latest release
           draft: false
