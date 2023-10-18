@@ -64,6 +64,8 @@ pub struct AppArgs {
 
 #[tokio::main]
 async fn main() {
+    dotenv::dotenv().ok();
+
     if let Err(error) = app_main().await {
         let error_code = error.error_code();
         log::error!("A fatal error occurred: {:?}", anyhow::format_err!(error));
