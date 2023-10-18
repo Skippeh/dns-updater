@@ -24,6 +24,8 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
             IpAddr::V6(_) => "AAAA",
         };
 
+        log::info!("WAN IP: {}", wan_ip);
+
         let account_domains = digital_ocean
             .list_all_domains()
             .await
