@@ -40,22 +40,23 @@ impl From<AppError> for i32 {
 #[derive(Debug, clap::Parser)]
 pub struct AppArgs {
     /// API key for DigitalOcean
-    #[clap(short('a'), long("api-key"))]
+    #[clap(short('a'), long("api-key"), env, hide_env_values = true)]
+    // hide_env_values = true to avoid leaking secrets
     pub do_api_key: String,
     /// How often (in minutes) to check WAN IP and update records.
     /// If unset the records will only be updated once and then the program will exit
-    #[clap(short('m'), long, allow_negative_numbers(false))]
+    #[clap(short('m'), long, allow_negative_numbers(false), env)]
     pub update_interval: Option<i64>,
     /// If this flag is **NOT** set the program will only validate that the specified
     /// domain records are of type A/AAAA depending on WAN ip type.
     /// It will also preview the changes that would be made
-    #[clap(default_value_t = false, short('A'), long)]
+    #[clap(default_value_t = false, short('A'), long, env)]
     pub apply: bool,
     /// List of fully qualified domain names to update the values for
-    #[clap(required = true, short('d'), long("domain"))]
+    #[clap(required = true, short('d'), long("domain"), env)]
     pub domains: Vec<String>,
     /// If this flag is set the 10 second warning on startup will not be shown before applying record changes.
-    #[clap(default_value_t = false, short('S'), long)]
+    #[clap(default_value_t = false, short('S'), long, env)]
     pub skip_warning: bool,
 }
 
