@@ -14,6 +14,8 @@ pub enum WanIpError {
     QueryFailed(anyhow::Error),
     #[error("URL parse error: {0}")]
     UrlParse(url::ParseError),
+    #[error("There are no WAN IP API endpoints configured")]
+    NoApiEndpointsConfigured,
 }
 
 impl From<tokio::io::Error> for WanIpError {
@@ -34,6 +36,10 @@ const FILE_PATH: &str = "api_urls.txt";
 pub async fn query_wan_ip() -> Result<IpAddr, WanIpError> {
     let api_urls = load_api_urls().await?;
     let mut last_error: Option<anyhow::Error> = None;
+
+    if api_urls.is_empty() {
+        return Err(WanIpError::NoApiEndpointsConfigured);
+    }
 
     for api_url in api_urls {
         let response = reqwest::get(api_url).await;

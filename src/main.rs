@@ -6,10 +6,13 @@ use anyhow::{Context, Result};
 use clap::Parser;
 use wan_ip_query::WanIpError;
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum AppError {
+    #[error("The DigitalOcean key is invalid")]
     TestFailedDOKeyValidation,
+    #[error("Failed to query WAN IP: {0}")]
     TestFailedToQueryWanIp(WanIpError),
+    #[error("An unexpected error occurred: {0}")]
     OtherError(anyhow::Error),
 }
 
@@ -26,10 +29,9 @@ impl From<wan_ip_query::WanIpError> for AppError {
     }
 }
 
-// Process exit codes for each type of error
-impl From<AppError> for i32 {
-    fn from(err: AppError) -> Self {
-        match err {
+impl AppError {
+    pub fn error_code(&self) -> i32 {
+        match self {
             AppError::TestFailedDOKeyValidation => 1,
             AppError::TestFailedToQueryWanIp(_) => 2,
             AppError::OtherError(_) => 3,
@@ -63,8 +65,9 @@ pub struct AppArgs {
 #[tokio::main]
 async fn main() {
     if let Err(error) = app_main().await {
-        log::error!("A fatal error occurred: {error:#?}");
-        std::process::exit(error.into())
+        let error_code = error.error_code();
+        log::error!("A fatal error occurred: {:?}", anyhow::format_err!(error));
+        std::process::exit(error_code)
     }
 }
 
