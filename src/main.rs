@@ -86,7 +86,7 @@ async fn app_main() -> Result<(), AppError> {
     let apply = args.apply;
 
     if apply && !args.skip_warning {
-        log::info!("WARNING: Applying changes to following domain records, terminate with CTRL+C to cancel (continuing in 10 seconds, pass -S to skip this warning):");
+        log::info!("WARNING: The following domain records will be modified, terminate with CTRL+C to cancel (continuing in 10 seconds, pass -S to skip this warning):");
 
         for domain in &args.domains {
             log::info!("- {domain}");
