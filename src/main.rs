@@ -74,15 +74,20 @@ async fn main() {
 }
 
 async fn app_main() -> Result<(), AppError> {
-    simple_logger::SimpleLogger::new()
-        .with_local_timestamps()
+    let logger = simple_logger::SimpleLogger::new()
         .with_level(get_minimum_log_level())
         .env()
         .with_timestamp_format(time::macros::format_description!(
             "[year]-[month]-[day] [hour]:[minute]:[second]"
-        ))
-        .init()
-        .context("Failed to initialize logger")?;
+        ));
+
+    if time::UtcOffset::current_local_offset().is_err() {
+        println!("Failed to determine local timezone, using UTC in log timestamps");
+        logger.with_utc_timestamps().init()
+    } else {
+        logger.with_local_timestamps().init()
+    }
+    .context("Failed to initialize logger")?;
 
     let args = AppArgs::parse();
     let apply = args.apply;
