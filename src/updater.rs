@@ -49,7 +49,28 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
             .map_err(|err| match err {
                 QueryError::Unauthorized(_) => AppError::TestFailedDOKeyValidation,
                 err => AppError::OtherError(err.into()),
-            })?;
+            });
+
+        if let Err(err) = account_domains {
+            if args.apply {
+                log::error!("Failed to query account domains: {err}");
+
+                match &err {
+                    AppError::TestFailedDOKeyValidation => {
+                        return Err(err);
+                    }
+                    _ => {
+                        log::info!("Retrying in 10 seconds...");
+                        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                        continue;
+                    }
+                }
+            } else {
+                return Err(err);
+            }
+        }
+
+        let account_domains = account_domains.expect("Should never be Err at this point");
 
         let (map, unknown_domains) =
             map_domain_args_to_account_domains(&args.domains, &account_domains);
