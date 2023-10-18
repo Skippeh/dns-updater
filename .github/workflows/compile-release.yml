@@ -35,16 +35,14 @@ jobs:
         run: cross build --release --target x86_64-pc-windows-gnu
       - name: Create release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1.13.0
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag: ${{ github.ref }}
+          name: Release ${{ github.ref }}
           draft: true
           prerelease: false
       - name: "Upload binary: aarch64-unknown-linux-musl"
-        uses: actions/upload-release-asset@v1
+        uses: tanyagray/action-upload-release-asset@v1.1.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -53,7 +51,7 @@ jobs:
           asset_name: dns-updater_aarch64-unknown-linux-musl
           asset_content_type: application/octet-stream
       - name: "Upload binary: x86_64-unknown-linux-musl"
-        uses: actions/upload-release-asset@v1
+        uses: tanyagray/action-upload-release-asset@v1.1.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -62,7 +60,7 @@ jobs:
           asset_name: dns-updater_x86_64-unknown-linux-musl
           asset_content_type: application/octet-stream
       - name: "Upload binary: x86_64-pc-windows-gnu"
-        uses: actions/upload-release-asset@v1
+        uses: tanyagray/action-upload-release-asset@v1.1.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
