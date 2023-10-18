@@ -33,11 +33,40 @@ jobs:
         run: cross build --release --target x86_64-unknown-linux-musl
       - name: Compile x86_64-pc-windows-gnu
         run: cross build --release --target x86_64-pc-windows-gnu
-      - name: Create builds artifacts
-        uses: actions/upload-artifact@v2
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: binaries
-          path: |
-            target/aarch64-unknown-linux-musl/release/dns-updater
-            target/x86_64-unknown-linux-musl/release/dns-updater
-            target/x86_64-pc-windows-gnu/release/dns-updater.exe
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false
+      - name: "Upload binary: aarch64-unknown-linux-musl"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/aarch64-unknown-linux-musl/release/dns-updater
+          asset_name: dns-updater_aarch64-unknown-linux-musl
+          asset_content_type: application/octet-stream
+      - name: "Upload binary: x86_64-unknown-linux-musl"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/x86_64-unknown-linux-musl/release/dns-updater
+          asset_name: dns-updater_x86_64-unknown-linux-musl
+          asset_content_type: application/octet-stream
+      - name: "Upload binary: x86_64-pc-windows-gnu"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/x86_64-pc-windows-gnu/release/dns-updater.exe
+          asset_name: dns-updater_x86_64-pc-windows-gnu.exe
+          asset_content_type: application/octet-stream
