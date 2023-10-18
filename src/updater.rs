@@ -70,7 +70,16 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
                                         ),
                                     ));
                                 } else {
-                                    // Update record
+                                    // Update record if it's different
+                                    if wan_ip.to_string() == record.data {
+                                        results.push((
+                                            Level::Info,
+                                            format!("✓ {}.{}: up to date", arg_domain, domain.name),
+                                        ));
+
+                                        continue;
+                                    }
+
                                     match digital_ocean
                                         .update_record(
                                             &domain.name,
