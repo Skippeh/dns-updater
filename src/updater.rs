@@ -176,7 +176,7 @@ fn map_domain_args_to_account_domains<'a, 'b>(
         });
 
         if let Some(domain) = domain {
-            map.entry(domain.clone())
+            map.entry(domain)
                 .or_insert(vec![])
                 .push(domain_arg.as_str());
         } else {
