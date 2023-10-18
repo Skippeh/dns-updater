@@ -16,6 +16,8 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
     loop {
         if args.apply {
             log::info!("Starting records update...");
+        } else {
+            log::info!("Starting records validation (not applying any changes)...");
         }
 
         let wan_ip = query_wan_ip().await?;
