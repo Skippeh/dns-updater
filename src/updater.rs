@@ -160,7 +160,7 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
                                 results.push((
                                     Level::Error,
                                     format!(
-                                        "{}{}: Record does not exist, or is not of type {}",
+                                        "{}{:<32}: Record does not exist, or is not of type {}",
                                         if args.apply { "✗ " } else { "" },
                                         arg_domain,
                                         wan_ip_type
@@ -175,7 +175,7 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
                         .get(domain)
                         .expect("Map should always contain the domain")
                     {
-                        results.push((Level::Error, format!("{domain}: {err:#?}")));
+                        results.push((Level::Error, format!("{domain:<32}: {err:#?}")));
                     }
                 }
             }
@@ -185,7 +185,7 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
             results.push((
                 Level::Error,
                 format!(
-                    "{}{}: Domain does not exist on this DigitalOcean account",
+                    "{}{:<32}: Domain does not exist on this DigitalOcean account",
                     if args.apply { "✗ " } else { "" },
                     arg_domain
                 ),
