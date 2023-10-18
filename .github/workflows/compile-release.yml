@@ -31,3 +31,7 @@ jobs:
         uses: Shogan/rust-musl-action@v1.0.2
         with:
           args: cargo build --release --target x86_64-apple-darwin
+      - name: Compile x86_64-pc-windows-gnu
+        uses: Shogan/rust-musl-action@v1.0.2
+        with:
+          args: cargo build --release --target x86_64-pc-windows-gnu
