@@ -7,6 +7,9 @@ name: Compile binaries and create release
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build-create-release:
