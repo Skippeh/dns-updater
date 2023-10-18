@@ -20,7 +20,22 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
             log::info!("Starting records validation (not applying any changes)...");
         }
 
-        let wan_ip = query_wan_ip().await?;
+        let wan_ip = query_wan_ip().await;
+
+        if let Err(err) = wan_ip {
+            if args.apply {
+                log::error!("Failed to query WAN IP: {err}");
+                log::info!("Retrying in 10 seconds...");
+
+                tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                continue;
+            } else {
+                return Err(AppError::TestFailedToQueryWanIp(err));
+            }
+        }
+
+        let wan_ip = wan_ip.expect("Should never be Err at this point");
+
         let wan_ip_type = match &wan_ip {
             IpAddr::V4(_) => "A",
             IpAddr::V6(_) => "AAAA",
