@@ -3,14 +3,14 @@
 # - Linux (x86_64-unknown-linux-musl, aarch64-unknown-linux-musl)
 #- macOS (x86_64-apple-darwin)
 
-name: Compile release builds
+name: Compile binaries and create release
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Compile all binaries
+  build-create-release:
+    name: Compile binaries and create release
     runs-on: ubuntu-latest
     env:
       CARGO_TERM_COLOR: always
