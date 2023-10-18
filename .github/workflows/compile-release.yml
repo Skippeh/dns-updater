@@ -1,0 +1,33 @@
+# Compile release bulids for the following platforms:
+# - Windows (x86_64-pc-windows-gnu)
+# - Linux (x86_64-unknown-linux-musl, aarch64-unknown-linux-musl)
+#- macOS (x86_64-apple-darwin)
+
+name: Compile release builds
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Compile all binaries
+    runs-on: ubuntu-latest
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Compile x86_64-unknown-linux-musl
+        uses: Shogan/rust-musl-action@v1.0.2
+        with:
+          args: cargo build --release --target x86_64-unknown-linux-musl
+      - name: Compile aarch64-unknown-linux-musl
+        uses: Shogan/rust-musl-action@v1.0.2
+        with:
+          args: cargo build --release --target aarch64-unknown-linux-musl
+      - name: Compile x86_64-apple-darwin
+        uses: Shogan/rust-musl-action@v1.0.2
+        with:
+          args: cargo build --release --target x86_64-apple-darwin
