@@ -41,6 +41,16 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
             IpAddr::V6(_) => "AAAA",
         };
 
+        // If wan type is ipv4, make sure it's not part of cg-nat subnet
+        if let IpAddr::V4(addr) = &wan_ip {
+            let [a, b, _, _] = addr.octets();
+
+            if a == 100 && b >= 64 && b <= 127 {
+                // This should always fatally error, since there's no point in retrying
+                return Err(AppError::CgNatWanIp(wan_ip));
+            }
+        }
+
         log::info!("WAN IP: {}", wan_ip);
 
         let account_domains = digital_ocean

@@ -2,6 +2,8 @@ mod digitalocean;
 mod updater;
 mod wan_ip_query;
 
+use std::net::IpAddr;
+
 use anyhow::{Context, Result};
 use clap::Parser;
 use wan_ip_query::WanIpError;
@@ -12,6 +14,8 @@ pub enum AppError {
     TestFailedDOKeyValidation,
     #[error("Failed to query WAN IP: {0}")]
     TestFailedToQueryWanIp(WanIpError),
+    #[error("WAN IP ({0}) is behind a CG-NAT")]
+    CgNatWanIp(IpAddr),
     #[error("An unexpected error occurred: {0}")]
     OtherError(anyhow::Error),
 }
@@ -35,6 +39,7 @@ impl AppError {
             AppError::TestFailedDOKeyValidation => 1,
             AppError::TestFailedToQueryWanIp(_) => 2,
             AppError::OtherError(_) => 3,
+            AppError::CgNatWanIp(_) => 4,
         }
     }
 }
