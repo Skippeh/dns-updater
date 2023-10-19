@@ -91,8 +91,6 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
             domain_records_futures.insert(domain, digital_ocean.query_domain_records(&domain.name));
         }
 
-        let mut results = Vec::new();
-
         for (domain, future) in domain_records_futures {
             match future.await {
                 Ok(records) => {
@@ -110,29 +108,23 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
                         match record {
                             Some(record) => {
                                 if !args.apply {
-                                    results.push((
-                                        Level::Info,
-                                        format!(
-                                            "{:<30}\t-> {} (current: {:>15}, TTL: {:>5}){}",
-                                            arg_domain,
-                                            wan_ip,
-                                            record.data,
-                                            record.ttl,
-                                            if wan_ip.to_string() == record.data {
-                                                " (up to date)"
-                                            } else {
-                                                ""
-                                            }
-                                        ),
-                                    ));
+                                    log::info!(
+                                        "{:<30} -> {} (current: {:>15}, TTL: {:>5}){}",
+                                        arg_domain,
+                                        wan_ip,
+                                        record.data,
+                                        record.ttl,
+                                        if wan_ip.to_string() == record.data {
+                                            " (up to date)"
+                                        } else {
+                                            ""
+                                        },
+                                    );
                                 } else {
                                     // Update record if it's different
                                     if wan_ip.to_string() == record.data {
                                         let fqdn = format!("{}.{}", record.name, domain.name);
-                                        results.push((
-                                            Level::Info,
-                                            format!("✓ {:<30}: up to date", fqdn),
-                                        ));
+                                        log::info!("✓ {:<30}: up to date", fqdn,);
 
                                         continue;
                                     }
@@ -149,33 +141,28 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
                                         Ok(new_record) => {
                                             let fqdn =
                                                 format!("{}.{}", new_record.name, domain.name);
-                                            results.push((
-                                                Level::Info,
-                                                format!(
-                                                    "✓ {:<30} -> {} (current: {:>15}, TTL: {:>5})",
-                                                    fqdn, new_record.data, record.data, record.ttl
-                                                ),
-                                            ))
+
+                                            log::info!(
+                                                "✓ {:<30} -> {} (current: {:>15}, TTL: {:>5})",
+                                                fqdn,
+                                                new_record.data,
+                                                record.data,
+                                                record.ttl,
+                                            )
                                         }
                                         Err(err) => {
-                                            results.push((
-                                                Level::Error,
-                                                format!("✗ {arg_domain:<30}: {err}"),
-                                            ));
+                                            log::error!("✗ {arg_domain:<30}: {err}",);
                                         }
                                     }
                                 }
                             }
                             None => {
-                                results.push((
-                                    Level::Error,
-                                    format!(
-                                        "{}{:<32}: Record does not exist, or is not of type {}",
-                                        if args.apply { "✗ " } else { "" },
-                                        arg_domain,
-                                        wan_ip_type
-                                    ),
-                                ));
+                                log::error!(
+                                    "{}{:<32}: Record does not exist, or is not of type {}",
+                                    if args.apply { "✗ " } else { "" },
+                                    arg_domain,
+                                    wan_ip_type,
+                                );
                             }
                         }
                     }
@@ -185,25 +172,18 @@ pub async fn start(args: AppArgs) -> Result<(), AppError> {
                         .get(domain)
                         .expect("Map should always contain the domain")
                     {
-                        results.push((Level::Error, format!("{domain:<32}: {err:#?}")));
+                        log::error!("{domain:<32}: {err:#?}");
                     }
                 }
             }
         }
 
         for arg_domain in unknown_domains {
-            results.push((
-                Level::Error,
-                format!(
-                    "{}{:<32}: Domain does not exist on this DigitalOcean account",
-                    if args.apply { "✗ " } else { "" },
-                    arg_domain
-                ),
-            ))
-        }
-
-        for (log_level, message) in results {
-            log::log!(log_level, "{}", message);
+            log::error!(
+                "{}{:<32}: Domain does not exist on this DigitalOcean account",
+                if args.apply { "✗ " } else { "" },
+                arg_domain,
+            )
         }
 
         if args.apply {

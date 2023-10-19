@@ -71,7 +71,7 @@ async fn load_api_urls() -> Result<Vec<Url>, WanIpError> {
             contents
                 .split('\n')
                 .filter(|url| !url.is_empty())
-                .map(|url| Url::parse(url))
+                .map(Url::parse)
                 .collect::<Result<Vec<_>, _>>()?
         }
         Err(err) => {
